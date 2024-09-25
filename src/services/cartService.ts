@@ -61,3 +61,47 @@ export const addItemToCart = async ({
 
   return { data: updatedCard, statusCode: 200 };
 };
+
+interface UpdateItemInCart {
+  userId: string;
+  productId: any;
+  quantity: number;
+}
+
+export const updateItemInCart = async ({
+  userId,
+  productId,
+  quantity,
+}: UpdateItemInCart) => {
+  const cart = await getActiveCartForUser({ userId });
+  const existsInCart = cart.items.find(
+    (p) => p.product.toString() === productId
+  );
+
+  if (!existsInCart) {
+    return { data: "item not exists in cart", statusCode: 400 };
+  }
+
+  const product = await productModel.findById(productId);
+  if (!product) {
+    return { data: "product not found", statusCode: 404 };
+  }
+
+  if (product.stock < quantity) {
+    return { data: "not enough stock", statusCode: 400 };
+  }
+
+  const otherCartItems = cart.items.filter(
+    (p) => p.product.toString() !== productId
+  );
+  let total = otherCartItems.reduce((sum, product) => {
+    return sum + product.quantity * product.unitPrice;
+  }, 0);
+
+  existsInCart.quantity = quantity; //imp
+  total += existsInCart.quantity * existsInCart.unitPrice;
+  cart.totalAmount = total;
+
+  const updatedCart = await cart.save();
+  return { data: updatedCart, statusCode: 200 };
+};
