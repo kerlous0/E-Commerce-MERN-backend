@@ -5,18 +5,22 @@ export const getAllProducts = async () => {
 };
 
 export const sendInitailProducts = async () => {
-  const products = [
-    {
-      title: "Dell Laptop",
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9aodusVTpoxoHdvs1VKvLeaIZzHb9p1Ni9w&s",
-      price: 15000,
-      stock: 100,
-    },
-  ];
+  try {
+    const products = [
+      {
+        title: "Dell Laptop",
+        image:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9aodusVTpoxoHdvs1VKvLeaIZzHb9p1Ni9w&s",
+        price: 15000,
+        stock: 100,
+      },
+    ];
 
-  const existProduct = await getAllProducts();
-  if (existProduct.length === 0) {
-    await productModel.insertMany(products);
+    const existProduct = await getAllProducts();
+    if (existProduct.length === 0) {
+      await productModel.insertMany(products);
+    }
+  } catch (error) {
+    console.error("cannot see database", error);
   }
 };

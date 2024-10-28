@@ -184,8 +184,6 @@ export const checkout = async ({ userId, address }: Checkout) => {
     })
   );
 
-  console.log(orderItems);
-
   const order = await orderModel.create({
     userId,
     orderItems,
