@@ -1,4 +1,5 @@
 import { cartModel } from "../models/cartModel";
+import { IOrderItem, orderModel } from "../models/orderModel";
 import { productModel } from "../models/productModel";
 
 interface CreateCartForUser {
@@ -146,4 +147,55 @@ export const deleteItemInCart = async ({
   const updatedCart = await cart.save();
 
   return { data: updatedCart, statusCode: 200 };
+};
+
+interface Checkout {
+  userId: string;
+  address: string;
+}
+
+export const checkout = async ({ userId, address }: Checkout) => {
+  if (!address) {
+    return { data: "Address is required", statusCode: 400 };
+  }
+
+  const cart = await getActiveCartForUser({ userId });
+  if (cart.items.length === 0) {
+    return { data: "cart is empty", statusCode: 400 };
+  }
+
+  const orderItems: IOrderItem[] = [];
+  await Promise.all(
+    // or use for loop (of)
+    cart.items.map(async (p) => {
+      let product = await productModel.findOne({ _id: p.product });
+      if (!product) {
+        return { data: "Invalid product id", statusCode: 400 };
+      }
+
+      const orderItem: IOrderItem = {
+        productTitle: product.title,
+        productImage: product.image,
+        quantity: p.quantity,
+        unitPrice: p.unitPrice,
+      };
+
+      orderItems.push(orderItem);
+    })
+  );
+
+  console.log(orderItems);
+
+  const order = await orderModel.create({
+    userId,
+    orderItems,
+    total: cart.totalAmount,
+    address,
+  });
+
+  await order.save();
+
+  cart.status = "completed";
+  await cart.save();
+  return { data: order, statusCode: 200 };
 };
