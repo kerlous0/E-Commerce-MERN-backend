@@ -1,4 +1,5 @@
 import axios from "axios";
+import { FormData } from "../types/formData";
 
 const base_url = "http://localhost:3001";
 
@@ -11,13 +12,6 @@ export const fetchProduct = async () => {
     console.error(error);
   }
 };
-
-interface FormData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-}
 
 export const register = async (formData: FormData) => {
   try {

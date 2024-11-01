@@ -2,6 +2,7 @@ import { Box, Button, Container, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { register } from "../api/api";
 import Alert from "@mui/material/Alert";
+import { useAuth } from "../context/Auth/AuthContext";
 
 function RegisterPage() {
   const initailState = {
@@ -12,6 +13,8 @@ function RegisterPage() {
   };
   const [formData, setFormData] = useState(initailState);
   const [error, setError] = useState("");
+  const { login } = useAuth();
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -24,7 +27,13 @@ function RegisterPage() {
       setError(response.error);
       return;
     }
-    console.log(response.data);
+
+    if (!response.data) {
+      return;
+    }
+
+    login(formData.firstName, formData.email, response.data);
+    console.log(formData.firstName);
   };
 
   useEffect(() => {

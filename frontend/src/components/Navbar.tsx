@@ -10,10 +10,13 @@ import Avatar from "@mui/material/Avatar";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
+import { useAuth } from "../context/Auth/AuthContext";
+import avatar from "./iconn.jpg";
 
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 function Navbar() {
+  const { name } = useAuth();
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
     null
   );
@@ -84,12 +87,24 @@ function Navbar() {
               Tech Shop
             </Typography>
 
-            <Box sx={{ flexGrow: 0 }}>
+            <Box sx={{ flexGrow: 0, display: "flex", alignItems: "center" }}>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                  <Avatar alt={name || "undefined"} src={avatar} />
                 </IconButton>
               </Tooltip>
+              <Typography
+                sx={{
+                  ml: 2,
+                  mr: { xs: 0, md: 5 },
+                  flexGrow: 1,
+                  fontFamily: "monospace",
+                  fontWeight: 700,
+                  color: "white",
+                }}
+              >
+                {name}
+              </Typography>
               <Menu
                 sx={{ mt: "45px" }}
                 id="menu-appbar"
